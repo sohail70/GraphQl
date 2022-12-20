@@ -1,0 +1,48 @@
+tozihate graph ql pak shod badan dobare az video bebin benvis vali kholase ine:
+
+az site https://api.spacex.land/graphql/ vase endpoint amade graphql mikhaym use kunim
+dar site graph ql ham beri javascript ro bezani server side darim va client side ke ma felan faghat client side ro use mikunim az Apollo client ham use mikunim
+hameye software ha az Graph ql query language use kardan pas gij nashoo 
+faghat ham niaz be ye endpoint dare ke mamolan /graphql/ hast va ye single json ham response mide ke kheili khoobe va 20 ta api endpoint ro niaz nist dar front end manage kunim
+modifalble hast ke age dar site e space x ham negah kuni request ro ye bakhshisho hazf kuni response esh nemiad 
+badan ham mirim soraghe server side ke backend ro bezanim vali felan focus roye fornt end hast
+
+boro dar folder e react va ino bezan:
+npx create-react-app graphql --template typescript
+
+az https://graphql.org/code/ boro toye https://www.apollographql.com/docs/react/ va bad https://www.apollographql.com/docs/react/get-started
+ke apollo client ro nasb kuni:
+npm install @apollo/client graphql --> we need to install graphql and also the client that we are using which is apollo here
+
+tebghe doc e apollo ham bayad dar index.tsx benvisi:
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+
+now we need a instacle of a client --> use ApolloClient
+
+let client = new ApolloClient({
+  uri: 'https://api.spacex.land/graphql/',
+  cache: new InMemoryCache
+});
+
+dar doc alabte javascrpit esho tozih dade chejoori setup kunim graphql ro
+ye simple query dar index.js use mikunim felan ta ye response az server begirim
+az client.query({}).then(()=>{}) use mikunim va toye then ham ye arrow function mizarim va ...
+zemana query ham object migire tosh az section PROBLEM dar terminal ham mitoni hint begiri chi tosh bayad bezari
+formate neveshtan injoorie ---> gql bayad bezari avalesh va bad az backtick use kuni
+query: gql``
+dakhele backtick ham hamoon request aval safhyeye api.spacex.land ro bezar ---> ye bakhshi azash ham kafie --> masalan ta sare link
+
+client.query({
+  query: gql`{
+  launchesPast(limit: 10) {
+    mission_name
+    launch_date_local
+    launch_site {
+      site_name_long
+      }
+    }
+  }`
+}).then((response)=>{console.log(response)});
+
+
+hala npm start ro bezan dar consolde object ro bebin
