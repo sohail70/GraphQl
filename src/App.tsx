@@ -24,7 +24,9 @@ function  App() {
 
   return (
     <div className="App">
-      <p>hello world</p>
+      {data ? data.launchesPast.map((launch: any)=>{
+          return <p>{launch.mission_name}</p>
+        }):null}
     </div>
   );
 }
