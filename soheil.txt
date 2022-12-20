@@ -69,3 +69,17 @@ gql`{
   }`;
 
 hala dar dakhele App function az useQuery use kun va 3 ta var ro ham azash bishta niaz nadarim --> loading, error , data
+
+return ham bokon dar App ke chap kune mission name ro 
+type ro felan any bezar badan dorost mikunim
+
+berim type ro dorost kunim: ye copy az response e site api.spacex.land begir masalan:
+ {
+        "mission_name": "Starlink-15 (v1.0)",
+        "launch_date_local": "2020-10-24T11:31:00-04:00",
+        "launch_site": {
+          "site_name_long": "Cape Canaveral Air Force Station Space Launch Complex 40"
+        }
+
+    ta type ro ijad kuni
+    va jaye actual value hashon ham type ro bezar masalan jaye "Starlin-15 (v1.0) benvis string

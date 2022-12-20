@@ -3,6 +3,14 @@ import {useQuery , gql} from '@apollo/client';
 import { useEffect } from 'react';
 
 
+export type Launch =  {
+        "mission_name": string,
+        "launch_date_local": string,
+        "launch_site": {
+          "site_name_long": string
+        }
+};
+
 const GET_DATA = 
 gql`{
   launchesPast(limit: 10) {
@@ -24,8 +32,8 @@ function  App() {
 
   return (
     <div className="App">
-      {data ? data.launchesPast.map((launch: any)=>{
-          return <p>{launch.mission_name}</p>
+      {data ? data.launchesPast.map((launch: Launch)=>{
+          return <p>{launch.mission_name + ' ' + launch.launch_date_local}</p>
         }):null}
     </div>
   );
