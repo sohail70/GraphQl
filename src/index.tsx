@@ -9,22 +9,14 @@ let client = new ApolloClient({
   cache: new InMemoryCache
 });
 
-client.query({
-  query: gql`{
-  launchesPast(limit: 10) {
-    mission_name
-    launch_date_local
-    launch_site {
-      site_name_long
-      }
-    }
-  }`
-}).then((response)=>{console.log(response)});
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
   </React.StrictMode>
 );

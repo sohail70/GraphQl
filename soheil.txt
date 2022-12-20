@@ -46,3 +46,26 @@ client.query({
 
 
 hala npm start ro bezan dar consolde object ro bebin
+alabte rahe dorost in nist:
+balke rahe dorost use kardan az hook react hast ---> useQuery
+
+az Apollor provide ke import kardim vase access kardan be client varibale e ke ijad kardim throughout our entire application use mikunim
+bayad surround kune roye tag e App dar index.tsx --> hala mitoni be client dar kule App dastrasi peyda kuni
+
+hala dar App.tsx bevnis:
+import {useQuery , gql} from '@apollo/client'
+va query ee ke dar index.tsx dorost kardi ro move kun be App.tsx
+name esh ro ham avaz kun bezar GET_DATA
+in sabki ham benvis yani client. nazar:
+const GET_DATA = 
+gql`{
+  launchesPast(limit: 10) {
+    mission_name
+    launch_date_local
+    launch_site {
+      site_name_long
+      }
+    }
+  }`;
+
+hala dar dakhele App function az useQuery use kun va 3 ta var ro ham azash bishta niaz nadarim --> loading, error , data
