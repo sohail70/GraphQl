@@ -83,3 +83,167 @@ berim type ro dorost kunim: ye copy az response e site api.spacex.land begir mas
 
     ta type ro ijad kuni
     va jaye actual value hashon ham type ro bezar masalan jaye "Starlin-15 (v1.0) benvis string
+
+
+-----------------------------------------------------------------------------------------------------------
+
+how to add graph ql to our backend to have control of the process from the beginning to end
+Setup graph ql on our backend: pas felan UI ro velesh
+use Django
+
+we use the same model and data that we had before so we won't have to recreate that again
+
+use a tool called Graphene-Django --> https://docs.graphene-python.org/projects/django/en/latest/ --> amoozesh nasb ro azash bebin
+zemana az amozesh in site kamel nemirim yani masalan az customer data khodemon mikhaym use kunim 
+code e backend ro baz kun boro to virtual environment va benvis:
+pip install graphene-django
+ro bezan
+
+hala ino bezan 
+pip freeze --local > requirements.txt
+
+hala dar setting.py bayad add a few things kuni
+tebghe in boro --> https://docs.graphene-python.org/projects/django/en/latest/installation/
+
+INSTALLED_APPS = [
+    ...
+    "django.contrib.staticfiles", # Required for GraphiQL
+    "graphene_django"
+]
+
+avalish ro hamin alan darim pas faghat dovomi ro ezaf kun
+
+
+ino ham bayad bezari:
+GRAPHENE = {
+    "SCHEMA": "django_root.schema.schema"
+}
+
+SCEMA dar vaghe structure of our data ro mige --> ghabl inke ask kuni chi mikhay bayad structure data ro begi
+
+injoori bayad benvisi:
+GRAPHENE = {
+    "SCHEMA": "customers.schema.schema" #avalin schema mishe scema file with shema object
+}
+customers aval ham ke nevshti mishe name e project asli dar backend yani name e folder root
+hala bayad in file schema.py ro ke neveshti bala injad kuni --> shabih serializer.py hast ke vase rest api ijad kardi
+ama lana vase graph ql hast.
+ye class va meta class dar schema.py ijad kun mesle serializer.py
+
+
+kulan class mishe in:
+import graphene
+from graphene_django import DjangoObjectType
+
+from customers.models import Customer
+
+class CustomerType(DjangoObjectType):
+    class Meta:
+        model = Customer
+        fields = '__all__'
+
+class Query(graphene.ObjectType):
+    all_customers = graphene.List(CustomerType)
+
+    def resolve_all_customers(root,info):
+        return Customer.objects.all()
+
+
+
+schema = graphene.Schema(query=Query)
+
+
+mitoni az document e graphen ino yad begir
+
+hala dar url.py enpoint e graphql ro bezar
+
+from graphene_django.views import GraphQLView
+path('graphql' , GraphQLView.as_view(graphiql=True))
+
+GraphQLView is the view that we are going to render
+
+
+
+hala python3 manage.py runerver ro bezan
+
+zemana age error dad incompatiliby with djangoo 4 hast ke in vase django 3 hast 
+dar Settings.py benvis:
+import django
+from djangoo.utils.encoding import force_str
+django.utils.encoding.force_text = force_str
+
+
+
+
+dar nahayt in site ro baz kun --> http://127.0.0.1:8000/graphql/
+hala mibini server ro
+agar alamate Docs dar bala samte rast ro bezani endpoint haye mokhtalef ro behet mide
+query ro bezan boro jelo customerType ro bezan o ina ta befahmi ke samte chap chi mitooni benvisi:
+injoori benvis: --> niazi be comma va colon nadari moghe neveshtane query:
+{
+  allCustomers{
+    id --> field e ke mikhay ro minvisi
+    name
+    industry
+  }
+}
+
+hala play ro bezan
+jelootar nested data ham ezaf mikunim va in dastana
+alabtae felan UI ro dorst mikunim:
+------------------------------------------------------------------------------
+UI for our graphql backedn: connect to our custom graphql endpoint:
+Url e index.tsx ro replace kun:
+  uri: 'http://localhost:8000/graphql', //deghat kun ba uri bala fargh dare chun http hast
+
+alabte consolde ro negah kuni POST error mide:
+403 forbidden mide ---> cross site request forgety --> CSRF marboot djangoo hast ke ye joor protection hast ke ma niazi nadarim --> stack search kin:
+DI need csrf token if im using bearer jwt ---> our graph ql doesn't need authorization
+alabte bishtar search kun
+
+you go to a malicious website and this malicious website know waht end point I usually use on a truested website and I have that cooky from my authorizationso that maclicious website 
+can execute that on my behalf and that request could be sth sensetive such as changing my password or transfering funds of some sort
+to fix this django forms has token that is send to the client and is requeied to be valid when sent back in a POST request
+kholase alan ham hamchin error e mide ke mige shoma valid CSRF token nadari so we won't let you access this end point
+to fix the error we say this endpoint is exempt and we don't need csrf token
+pas dar backend dar urls.py benvis:
+from django.views.decorators.csrf import csrf_exempt
+path('graphql/' ,csrf_exempt(GraphQLView.as_view(graphiql=True))) --> dar vaghe path ghabli ro correct kun
+
+
+hala error 400 miad ke bad request hast chun bayad ba endpoint emon adapt kune request ee ke darim midim
+hamishe yadet bashe dar urls.py hamishe forward slash akhar ro bezari dar UI ham hamintoor vaghti uri mizari forward slahs akhar yadet nare
+dar in sharayet har non slash url ee ke dar browser minvisi redirect mishe be slashed version --> mishe dar setting.py ham chekc beshe 
+dar bakhshe MIDDLEWARE bayad django.middleware.common.CommonMiddleware ro dashte bashe
+
+zeman mitooni ye chiz jaddid zir benvisi dar setting.py injooori:
+APPEND_SLASH= True
+ ke khodesh append kune slahs ro --> alabte in default hast khoodesh vali explicit ham mitoni benvisi
+baghie slahs haro ham dar urls.py bezar
+
+
+hala ino :
+{
+  customers {
+    id
+    name
+    industry
+  }
+}
+
+replace kun roye GET_DATA dar App.tsx
+hala type haro ham dar 
+
+ye nokte: dar backedn oon bakhshe bala samte rast ke neveshte DOCS benazarate in name ha ke onjas az koja omade?
+az schema.py omade ---> age dar backedn be schema.py negah kuni dar class Query ye variable neveshti be name e 
+all_customers ke autoamtic tabdil shode be allCustomers 
+hala bia name ino taghir bede be customers ke rahat tar bashe
+
+pas format request alan shod in:
+{
+  customers {
+    id
+    name
+    industry
+  }
+}

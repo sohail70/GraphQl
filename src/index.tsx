@@ -5,7 +5,8 @@ import App from './App';
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 
 let client = new ApolloClient({
-  uri: 'https://api.spacex.land/graphql/',
+  // uri: 'https://api.spacex.land/graphql/',
+  uri: 'http://localhost:8000/graphql/', //deghat kun ba uri bala fargh dare chun http hast 
   cache: new InMemoryCache
 });
 
