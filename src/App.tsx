@@ -1,7 +1,7 @@
 import './App.css';
 import {useQuery, useMutation , gql} from '@apollo/client';
 import { useEffect , useState } from 'react';
-
+import AddOrder from './components/AddOrder';
 
 // export type Launch =  {
 //         "mission_name": string,
@@ -78,6 +78,7 @@ function  App() {
 
   return (
     <div className="App">
+      <h1>Customers</h1>
       {/* {data ? data.launchesPast.map((launch: Launch)=>{
           return <p>{launch.mission_name + ' ' + launch.launch_date_local}</p>
         }):null} */}
@@ -86,21 +87,23 @@ function  App() {
       {loading? <p>loading...</p>: null}
       {data ? data.customers.map((customer: Customer)=>{
           return (
-            <div>
-              <h2 key={customer.id}>{customer.name + ' (' + customer.industry + ')'}</h2>
+            <div key={customer.id}>
+              <h2 >{customer.name + ' (' + customer.industry + ')'}</h2>
               {customer.orders.map((order: Order)=>{
                 return( 
-                <div>
+                <div key={order.id}>
                   <p>{order.description}</p>
                   <p>Cost: ${(order.totalInCents/100).toLocaleString(undefined , {minimumFractionDigits: 2 , maximumFractionDigits: 2})}</p>
                 </div>
                 );
               })}
+              <AddOrder customerId={customer.id}/>
             </div>
           )
         }):null}
 
-
+        
+        <h3>Add a Customer: </h3>
 
         <form onSubmit={(e)=>{
           e.preventDefault(); // Prevent a page refresh after submit
@@ -112,15 +115,15 @@ function  App() {
           }
         }}>
           <div>
-              <label htmlFor="name">Name:</label>
+              <label htmlFor="name">Name: </label>
               <input id="name" type="text" value={name} onChange={(e)=>{setName(e.target.value)}} />
           </div>
-
+          <br/>
           <div>
-              <label htmlFor="industry">Industry:</label>
+              <label htmlFor="industry">Industry: </label>
               <input id="industry" type="text" value={industry} onChange={(e)=>{setIndustry(e.target.value)}}/>
           </div>
-
+          <br />
           <button disabled={createCustomerLoading ? true : false}>Add Customer</button>
           {createCustomerError ? <p>Error Creating Customer</p> : null}
 

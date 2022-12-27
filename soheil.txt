@@ -577,4 +577,16 @@ hala chikar kunim ke dar page namayesh dade beshe --> dar App.tsx onjaee ke map 
 alan chun har customer object dakhelesh array of order hast pas mishe roye order, map zad va namyesh dad
 
 <h2>{customer.orders.map((order: Order)=>{})}</h2>   --> yani har order daraye type e Order hast
-{minimumFractionDigits: 2 , maximumFractionDigits: 2} ---> in yani two digits after the decimal dashte bashe hata age 0 ham bashe! 
+{minimumFractionDigits: 2 , maximumFractionDigits: 2} ---> in yani two digits after the decimal dashte bashe hata age 0 ham bashe!
+
+
+ berim soraghe ezaf kardan order dar UI --> vase Add customer niazi be id nabood ama inja niaze ---> masalan ye pop up e biad ke begim be che id ee mikhaym order ro ezaf kunim
+ alabte backend code vase add a new order dar graphql endpoint ro nanveshtim vali felan basic setup ro dar front end ijad mikunim
+ dar App.tsx dar div e ke order.description o ina ro migir ye tag bezar <AddOrder ..../> va compoentn AddOrder.tsx ro be src ezaf kun va tosh ro por kun --> alabte ye newfolder ijad kun be esme components va ino tosh bezar
+
+ dar kul dar AddOrder.tsx har vaght +new order click shod ye form baz kun va form ro ham az hamooni ke dar App.tsx nevehti copy kun
+ deghat kun AddPrder.tsx is supposed to be a neseted component so give everything it needs through its parent which is located in App.tsx
+ zeman query to anjam nade chun backend emon naghese
+
+ khob front emon dorost shod vali backend monde
+ 
