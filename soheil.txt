@@ -247,3 +247,334 @@ pas format request alan shod in:
     industry
   }
 }
+
+--------------------------------------------------
+arg passed in to graph ql to change what kind of data we are asking for
+mutation --> add or edit data in our data set
+
+this session is in the backedn again:
+
+dar vaghe mikhaym in joori ham betooni additional information ham bedim ke masalan specidifc name or id bedim:
+
+{
+  customers_by_name(name: "value") {
+    id
+    name
+    industry
+  }
+}
+
+
+pas boro dar scehma.py dar class Query ye field jadid benvis be name customer_by_name
+
+ino benvis :
+    customer_by_name = graphene.Field(CustomerType , name=graphene.String (required=True))
+
+hala boror dar site ebacked nva tahesh graphql ro ham bezar va bala samte rast DOCS ro bezan va bebin customer_by_name ezaf shode 
+ye hamchin chizi dar DOCS ezaf mishe --> customerByName(name: String!): CustomerType --> alamte ! ham yani required hast
+
+hala ye def ham dorost kun be name a resolve_customer_by_name
+
+zeman deghat kun customer_by_name tabdil mishe be customerByName
+pas age mikhay query kuni samte chap injoori benvis:
+{
+  customerByName(name: "value") {
+    id
+    name
+    industry
+  }
+}
+
+
+masalan benvis:
+{
+  customerByName(name: "Intel") {
+    id
+    name
+    industry
+  }
+}
+
+
+berim soraghe mutation ---> ba mutation mitoni data haye data basemoon ro change kunim
+and give it full CRUD capablity if we wish
+bayad dar scehma.py class Mutation(graphen.objectType) ijad kunim
+va schema = graphen.Scehama ro ham bayad berroz kunim --> chun age gharae in muttatoion tavasote graphen scema dide beshe pas be onvan e arg behes bede
+hala on karhayee ke dost dari user betoone anjam bede ro be onvane Field bezar to class Mutation
+vase ijad customer ye filed be name a createCustomer dorost mikunim ke niaz be class CreateCustomer dare ke ino ham ijad mikunim
+agar nemifahmi mohem nist chun az DOC bayad negah kuni
+alan age beri be site e backend DOCS ro bezani mibini ke new root type be name a mutation darim
+
+alan dar samte chap benvis:
+
+mutation{
+  createCustomer(name: "Soheil" , industry: "Crypto"){
+    customer{
+      id
+      name
+    }
+  }
+}
+
+hala play ro bezan--> alan ye customer jadid sakhte shod
+
+alabte deghat kun mutation ke ghable akolad gozashtim chera vase query nazashtim? mitooni bezari:
+
+query{
+  customers{
+    id
+  }
+}
+
+ama to halate default farz mikune Query hast
+
+
+kholase mishe alan vase update va delete ham behaviour ijad kard 
+
+hala chejoori mutation ro az front end anjam bedim? jalase bad
+---------------------------------------------------------------
+mutation in appolo client---> https://www.apollographql.com/docs/react/data/mutations/
+ezafe kardan customer az front end be graph ql
+bar khalafe useQuery, useMutation automatic operation esho on render anjam nemide va bayad invoke beshe yani mutate function ro bayad call kuni
+masalan mitooni in function ro vaghti ye evente mesle form submit anjam dadi invoke esh kuni
+dar App.tsx import yadet nare ---> import {useMutation} from '@apollo/client';
+
+tebghe doc deghat kun bayad injoori benvisi ---> const [createCustomer , {loading , error , data}] = useMutation(MUTATE_DATA);
+alabte rename kun ke ba useQuery be naming conflic nakhoori yani injoori benvis:
+  const [createCustomer , {loading: createCustomerLoading , error: createCustomerError , data: createCustomerData}] = useMutation(MUTATE_DATA); // mittoni jaye esme MUTATE_DATA benvisi add_csutomer --> kulan harchi dost dari benvis
+
+in ziri ro tebghe doc neveshtim  "!" yani required hast
+const MUTATE_DATA = gql`
+  mutation MUTATE_DATA($name: string! , $industry: string!){
+    createCustomer(name: $name , industry: $industry){
+      customer{
+        id
+        name
+      }
+    }
+  }
+`; //gql`` means its a graph query language string
+
+now create a form to get a name and industry from an input and substitute name and industry into that query and send it to the server
+
+az input chejoori mishe data ro gereft vaghti toye input dar UI chiz neveshti? mishe az e.target.value use kard ama vase typescript ye khorde sakhte chun bayad casting anjam bedi
+ma felan az state use mikunim ke rahat tare pas import kun use state ro az 'react' va state haye name va industry ro ijad kun be hamrahe setter eshon
+hala dar tag e input dar form attribute value ro benvis va onChange ham bayad in state haro berroz kune va az e.target.value ham use kun vase berroz resani
+hala dar tag e onSubmit consloe log kun name va industry ro
+deghat kun state update Asycn hast va ge mikhay motmaeen beshi ke most up to date value ro dari mitoni assocaite esh kuni ba state ee ke change shode on submit va useEffect ham bezari ke dependant bashe behesh
+vali bara ma ok hast chun bad az inke input name va industry ro neveshti zadan Enter ya zadan button e AddCustomer zaman mibare va dg motmaenan berroz shode state
+hala az mutation emon ke createCustomer hast use kun va benvis toye onSumbit e form
+
+hala boro dar UI customer ezaf kun --> zeman deghat kun age state hat meghdare deafult dashte bashan msalan empty string bashan yani '' 
+on vaght lozomi nadar input hato har dosho por kuni mitooni yekisho masalan name ro faghat por kuni
+albate alan deghat kuni niaz hast ke page refresh anjam beshe ta page berroz beshe. age be doc e Apollo client negah kun ye bakhsh dare be name e Update local data  ke rahe halesh ham
+refetching quries properties hast
+pas tebghe doc bayad useMutation ro berooz kuni va refetchQueries ro bezari tosh
+dar kul in khat --> {refetchQueries:[{query: GET_DATA}] --->  in khat baes mishe ke berooz niaz nabashe vase update e page --> dar vaghe ye query dg belafasele gozashtim bad az ijad customer
+
+vase button az attribute disabled use kun ke age loading nashood neshoon dade nashe
+
+How to simulate a slow request ---> by having a timer in your backend ---> dar code haye backend dar schema.[y dar class CreateCustomer dar fune e mutate benvis: time.sleep(5) zeman import ham yade nare --> import time
+alan age dar UI ye customer dar UI add kuni mibin button vase 5 sanie disabled mishe
+
+ye khorde clean up ham bokonim ---> age error e moghe add Cusotmer nagereftim mikhaym input ro erase kunim va age error e dashtim mikhaym display esh kunim
+dar App.tsx zre button dorost mikunimesh.
+vase test kardanesh mitoni dar backedn dar func e mutate dar schema.py 
+
+inaro ham dar onSumbit bezar:
+          if(!error){
+            setName('');
+            setIndustry('');
+          }
+ta bad az add kardan pak kune dakhele input ro
+----------------------------------------------------------------
+nested data in graphQL --> it makes graphql awesome 
+properties returned from that data 
+data may be coming from multiple table with joints or two completely different data bases 
+and that info federated together , it doens't matter
+the way we are going to do it is multiple tables in a realtional data base
+mitooni az noSQL data base ham use kuni ke dg niazi be migration and foreigh n key o kheili chizah niaz nadare va simple tare 
+data base desing series caleb ro ham negah kun ae mikhay daghigh yad begir
+mesali ke mikhaym kar kunim ine ke list of csutomer data ro begirim but also get any orders from the individual customers
+using nested data we could make one request to the backedn and get all the information at once which is a nice setup for a single page application --> chun vaghti multiple network request nadi application et very quick mishe
+alabte data base side et niaz be extra effort dari ke on data ha ro begire barat but it will reduce netwrok traffic from the front end making a request to the backend
+alabte mishe nested data ro ba traditional rest API ham anjam bedi ke yani structure esh ro dar backend ijad kuni va send it as a single json response
+but graph ql gives us the ability which relationships we want returedn and what properties on the nested data we want returned as well 
+
+avalan ke alan customers e ma nested data nadare --> mesale ma: customers orders hast
+so make an orders table and assign them to customers
+
+dar models.py dar backend ye class jadid Order ijad kun va filed hasho bezar
+az in doc use kun ---> https://docs.djangoproject.com/en/4.1/topics/db/examples/many_to_one/
+dar doc agar reporter ro pak kun CACADE baes mishe article esh ham pak she 
+alan ma ham hamintoorim dg chun age nested data bezarim customer ro pak kunim bayad order esh ham pak she
+albate option haye dg gheyr az cascade ham hast mesle protect va restrict va setNull va setDefault
+ino bekhoon--> https://docs.djangoproject.com/en/4.1/ref/models/fields/
+stack serach --> what does on_delete do on django models --> ino bekhoon ta dastan ro befahmi
+
+djangoo has its own implemntation on top of SQL and these constriants are not created on the data base --> django dare emulate mikune sql ro
+
+
+kholase ino dar models.py benvis:
+
+
+class Order(models.Model):
+    customer = models.ForeignKey(Customer , on_delete=models.CASCADE)
+    description = models.CharField(max_length=500)
+    totalInCents = models.IntegerField()
+
+
+bad dar terminal benvis:
+python3 manage.py makemigrations
+
+0002_order.py ro dar file ha dorost kard alan
+alabte in SQL ee nist ke be data base mire --> this is just django specific stuff
+ama age sql ro mikhay bebini dar terminal benvis:
+python3 manage.py sqlmigrate customers 0002 --> customers name e app hast va 0002 shomare migration hast
+hala mitoni foreign key va customer id va int o in dastana ke dar models.py dar class order nveshti ro bebini
+ama chizi dar morede CASCADE on too nemibini --> nabayadam bebini chun on top of sql djangoo inkaro mikune
+nokte ine ke age az in db dar app haye dg use kuni in integrity rule ha onja define nashode chun toye DB define nemishe aslan
+
+hala dar terminal bezan:
+python3 manage.py migrate
+
+
+hala ke DB ro dorst kardim hala toye DB data bezarim: 
+felan az UI nemikhay inkaro bokonim mishe az terminal va python use kard
+mitoni ino add ham bokujni be admin site va manualy data type kuni using the CRUD capability --> ma in raveshoo mirim
+ravesh kholase ziade
+
+boro dar admin.py 
+benvis 
+admin.site.register(Order) va import esh ham bokon 
+
+hala server ro run kun
+va boro to admin site
+http://127.0.0.1:8000/admin/login/?next=/admin/
+ba soheil soheil vared sho be admin site
+
+
+dar models.py vase class Cusotmer ino ezaf kun:
+def __str__ ta vaghti dar admin site hasti customer haro be name bebini vaghti +Add ro vase Order mizani
+ye order vase john smith ezaf kun
+zemana display ro vase order ham dorsot kun ba implement kardane __str__
+
+ye order e dg vase john smith ijad kun hala
+adad total ro be cent neveshtim ke dg floating point nadidm vase hamin az integer filed use kardim
+
+hala boro be graphql site: http://127.0.0.1:8000/graphql/
+be graphen docs ham age negah kuni many to one relationship ro peyda mikuni
+class Category va Ingrediant ro search kun toye doceshon
+
+pas boro be schema.py va class jadid dorost kun tebghe doc be name a OrderType
+import kardan Order ham yadet nare
+dar class Query ham orders = ro benvis
+def resolve Order ro ham dorost kun
+
+hala age beri to site e graphql va bala samte rast DOCS ro bezani beri to query dar customerType mibini orders ijad hsode va kuli field dare va ye filed jadid be name e order set onja hast
+pas injoori nanvis:
+{
+  customers{
+    id
+    name
+    industry
+    orders{
+
+    }
+  }
+}
+
+balke injoori benvis:
+
+{
+  customers{
+    id
+    name
+    industry
+    orderSet{
+      id
+      description
+      totalInCents
+    }
+  }
+}
+
+badan migim chejoori name e orderSet ro avaz kunim
+chejoori name ro avaz kunim:
+dar models.py vagti dashti foreign key dorost mikardi mitonesti ye argument ham bedi be esme related_name
+ke yani mikhaym class Order ke dar Class Customer show up mikune esmesh chi bahse
+refresh kun site ro va:
+pas hala benvis:
+{
+  customers{
+    id
+    name
+    industry
+    orders{
+      id
+      description
+      totalInCents
+    }
+  }
+}
+
+
+alan boro to backedn site va chanta order ijad kun --> http://127.0.0.1:8000/admin/
+masalan Sal Brown va 2 ta order barash bezar va hala boro be graphql site --> http://127.0.0.1:8000/graphql/
+va ino benvis samte chap:
+query{
+  customers{
+    id
+    name
+    industry
+    orders{
+      id
+      description
+      totalInCents
+    }
+  }
+}
+
+
+ya msalan ino benvis:
+query{
+  customerByName(name: "Sal Brown"){
+    id
+    name
+    industry
+    orders{
+      id
+      description
+      totalInCents
+    }
+  }
+}
+
+mishe orders ro ham pak kard age nemikhay namayesh dade beshe yani injoori:
+query{
+  customerByName(name: "Sal Brown"){
+    id
+    name
+    industry
+  }
+}
+
+alabte query aval ham niazi  nist neveshte beshse
+
+
+in bood dar backend . hala berim soraghe front end: mitonim list of customers ro dar front dorost kunim va in option ro darim ke orderhashono inline on the page kenare khode customer bezarim
+ya mitoonim injoori dorost kunim ke ba click kardan roye customer data show up kune masalan modal pop up kune ya ye new page ijad kunim bad az click roye custommer vase didan ordereshoon va ba propse orderharo pass kunim
+jalase bad in endpoint ro consume mikunim
+------------------------------------------------------------------------------
+front end showing neseted data coming from graphql endpoint:
+mikhaym kenare name a customer ha order ro list kunim
+dar App.tsx hala bayad dar GET_DATA dar customers oon dakhel orders ro ham bezarim
+export type Customer ro ham berroz mikunim ke orders ro ba type Order[] ke array hast ghabool kune va type e jadid Order ro ham typescriptesho minvisim
+hala oon paeen ke Query mishe hamrahe data in chiza ham miad
+hala page ro refresh kun va dar netwerk check kun bebin chi omade be tab response ham negah kun ke daghigh bebnini chi az backedn omade ya tab preview ro negah kun
+
+hala chikar kunim ke dar page namayesh dade beshe --> dar App.tsx onjaee ke map zadi ro berroz kun
+alan chun har customer object dakhelesh array of order hast pas mishe roye order, map zad va namyesh dad
+
+<h2>{customer.orders.map((order: Order)=>{})}</h2>   --> yani har order daraye type e Order hast
+{minimumFractionDigits: 2 , maximumFractionDigits: 2} ---> in yani two digits after the decimal dashte bashe hata age 0 ham bashe! 
