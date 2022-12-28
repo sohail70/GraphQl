@@ -589,4 +589,37 @@ alan chun har customer object dakhelesh array of order hast pas mishe roye order
  zeman query to anjam nade chun backend emon naghese
 
  khob front emon dorost shod vali backend monde
- 
+
+-----------------------------------------------------------
+ye seri clean up --> dar backend convention in hast ke field ha ba underscore bashan na camel case 
+dar  schema.py masalan createCustomer ro bokom create_customer
+dar models.py ham totalInCents ro bokon total_in_cents --> ama hala chun models.py ro taghir dadi dar terminal benvis:
+  python3 manage.py makemigrations
+  python3 manage.py migrate
+
+ro bezan ta taghirat emal beshe
+
+hala berim soraghe setup e backedn vase ezaf kardan order
+dar schema.py dar class mutations create_order ro ijad kun va class CreateOrder ro ham ijad kun
+
+alan dar site e backedn graphql benvis
+mutation{
+  createOrder(customer: 1 , description: "baked cookies" , totalInCents: 70000)
+  {
+    order{
+      id
+      customer{
+        id
+      }
+      description
+      totalInCents
+    }  
+  }
+}
+hala play ro bezan
+
+hala mirim UI ro correct kunim ta az in use kune
+------------------------------------------------------------
+connect UI to backedn: yani vaghti Add order ro zadim mikhaym be graph ql endpoint vasl she va order ro be backedn ezaf kune
+az useMutation az Apollo client use mikunim
+
