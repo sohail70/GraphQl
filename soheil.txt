@@ -623,3 +623,9 @@ hala mirim UI ro correct kunim ta az in use kune
 connect UI to backedn: yani vaghti Add order ro zadim mikhaym be graph ql endpoint vasl she va order ro be backedn ezaf kune
 az useMutation az Apollo client use mikunim
 
+dar AddOrders.tsx az useMutation use mikunim va niazi ham nist khodemono dargir props az parentesh yani App.tsx kunim
+
+ye nokte dar morede inke update be sorate automatic bashe vaghti add order kardi?
+ma dar AddOrder.tsx hastim va onja darim order POST miferestim ama chejoori GET order kunim vaghti GET dar parent component yani dar App.tsx hast?
+chun apolloclient has an internal cache dare ba dobare gozashtan GET_DATA dar AddOrder update data sorat migire va rerender mishe bedone inke reference e be parent component bezane
+pas GET_DATA ro az App.tsx copy kun toye child yani AddOrder.tsx va  argoman refetchQueries ro ezaf kun be useMutation dar AddOrder.tsx

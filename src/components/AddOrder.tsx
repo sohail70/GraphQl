@@ -1,8 +1,25 @@
 import { useMutation , gql } from "@apollo/client";
-import { useState } from "react";
-import { createExportDeclaration } from "typescript";
+import { useEffect, useState } from "react";
 
-// format in chizaee ke paeen minvisim lozoman bar aval daghigh nist va bayad az graphql komak begiri va ye bar ham invoke kunim bebinim ke query moon ro javab mide backend ya na syntax haro eshtebah neveshtim
+
+
+const GET_DATA = 
+gql`
+  {
+    customers {
+      id
+      name
+      industry
+      orders{
+        id
+        description
+        totalInCents
+      }
+    }
+  }`;
+
+
+  // format in chizaee ke paeen minvisim lozoman bar aval daghigh nist va bayad az graphql komak begiri va ye bar ham invoke kunim bebinim ke query moon ro javab mide backend ya na syntax haro eshtebah neveshtim
 const MUTATE_DATA = gql`
   mutation MUTATE_DATA($description: String! , $totalInCents: Int! , $customer: ID){
     createOrder(customer: $customer , description: $description , totalInCents: $totalInCents){
@@ -34,9 +51,19 @@ export default function AddOrder({customerId}: AppProps){
             error,
             data,
         },
-    ] = useMutation(MUTATE_DATA);
+    ] = useMutation(MUTATE_DATA , {
+        refetchQueries: [
+            {query: GET_DATA} , 
+        ],
+    });
 
-
+    useEffect(()=>{
+        if(data){
+            console.log(data);
+            setDescription('');
+            setTotal(NaN);
+        }
+    } , [data]); // in useEffect vase ine ke age data az backend omad pas yani movafaghiat amiz bode process --> masalan ye typo toye query bala dashte bashee in dg log nemikune
     return (
         <div>
             {active ? null : <button onClick={(e)=>{ // ta vaghti roye button e new Order click kardi mahv beshe
@@ -67,9 +94,9 @@ export default function AddOrder({customerId}: AppProps){
                     <br />
                     {/* <button disabled={createCustomerLoading ? true : false}>Add Customer</button>
                     {createCustomerError ? <p>Error Creating Customer</p> : null} */}
-                    <button>+Add Order</button>
+                    <button disabled={loading ? true: false}>+Add Order</button>
                     </form>
-                
+                    {error ? <p> sth went wrong</p> : null}
                 </div>: null}
         </div>
     );
